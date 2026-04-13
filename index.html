@@ -489,6 +489,10 @@
     <div id="login-error">Usuario o contrasena incorrectos. Intenta de nuevo.</div>
     <button class="btn-login" id="btn-entrar">Entrar</button>
     <div class="login-pie">BCF MG Consultoria S.C. - Sistema de impresion de etiquetas v1.0</div>
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid #eee;font-size:10px;color:#b0b8c4;text-align:center;line-height:1.6;">
+      Acceso restringido a usuarios autorizados por BCF MG Consultoria, S.C..<br>
+      El uso no autorizado de esta herramienta esta prohibido.
+    </div>
   </div>
 </div>
 
@@ -649,6 +653,13 @@
       <tr><td>PDF sale en vertical</td><td>Dialogo de impresion</td><td>Seleccionar orientacion = Horizontal</td></tr>
     </table>
   </div>
+
+  <footer style="background:#f8f9fb;border-top:1px solid #e2e6ed;padding:10px 20px;text-align:center;font-family:Arial,Helvetica,sans-serif;font-size:10.5px;color:#a0a8b4;line-height:1.6;">
+    &copy; <span id="footer-anio"></span> BCF MG Consultoria, S.C.. Herramienta de uso interno y confidencial.
+    La informacion ingresada no es almacenada ni transmitida por el sistema.
+    Uso exclusivo para usuarios autorizados.
+  </footer>
+
 </div>
 
 <!-- ============================================================
@@ -1226,6 +1237,10 @@ btnLimpiar.addEventListener("click",function(){
 });
 
 aplicarTipografia();
+
+/* Año actual en el footer */
+const elAnio = document.getElementById("footer-anio");
+if (elAnio) elAnio.textContent = new Date().getFullYear();
 </script>
 </body>
 </html>
