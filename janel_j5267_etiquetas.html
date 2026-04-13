@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Etiquetas Expedientes KONE - Carta Horizontal</title>
+  <style>
+    /* ============================================================
+       VARIABLES DE CALIBRACION
+    ============================================================ */
+    :root {
+      --hoja-ancho: 279.4mm;
+      --hoja-alto:  215.9mm;
+      --margen-superior:  5mm;
+      --margen-inferior:  5mm;
+      --margen-izquierdo: 7mm;
+      --margen-derecho:   7mm;
+      --etiqueta-ancho: 125mm;
+      --etiqueta-alto:  13mm;
+      --gap-horizontal: 7mm;
+      --gap-vertical:   0mm;
+      --columnas: 2;
+      --filas: 15;
+      /* Tipografia - se sobreescribe desde JavaScript al cambiar los controles */
+      --fuente:      Arial, Helvetica, sans-serif;
+      --tam-numero:  9pt;
+      --tam-nombre:  8.5pt;
+      --color-primario:   #1F3864;
+      --color-secundario: #2E75B6;
+      --color-fondo-ui:   #f0f4f9;
+      --color-guia:       #aaaaaa;
+      --logo-alto: 8mm;
+    }
+
+    /* ============================================================
+       INTERFAZ (solo pantalla)
+    ============================================================ */
+    @media screen {
+      * { box-sizing: border-box; }
+      body { font-family: Arial, Helvetica, sans-serif; background: var(--color-fondo-ui); margin: 0; padding: 0; }
+
+      #panel-control {
+        background: var(--color-primario); color: #fff;
+        padding: 16px 28px 20px;
+        display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end;
+      }
+      #panel-control h1 { width: 100%; margin: 0 0 4px; font-size: 14px; font-weight: bold; }
+      #panel-control h1 span { font-weight: normal; opacity: 0.7; font-size: 12px; margin-left: 8px; }
+      .grupo-control { display: flex; flex-direction: column; gap: 4px; }
+      #panel-control label { font-size: 11px; opacity: 0.8; }
+
+      #panel-control input[type="file"],
+      #panel-control select,
+      #panel-control input[type="number"] {
+        font-size: 12px; padding: 5px 8px;
+        border: 1px solid #8db4d8; border-radius: 3px;
+        background: #fff; color: #111; cursor: pointer;
+      }
+      #panel-control input[type="file"]   { min-width: 220px; }
+      #panel-control select               { min-width: 160px; }
+      #panel-control input[type="number"] { width: 64px; text-align: center; }
+
+      /* Separador visual entre grupos de controles */
+      .separador {
+        width: 1px; background: rgba(255,255,255,0.2);
+        align-self: stretch; margin: 0 4px;
+      }
+
+      .btn {
+        padding: 8px 16px; border: none; border-radius: 3px;
+        font-size: 12px; font-weight: bold; cursor: pointer; white-space: nowrap;
+      }
+      #btn-ejemplo     { background: #5a7fa0; color: #fff; }
+      #btn-guia        { background: #d08000; color: #fff; }
+      #btn-pdf         { background: #1a7a3a; color: #fff; }
+      #btn-limpiar     { background: #a33;    color: #fff; }
+      #btn-quitar-logo { background: #666;    color: #fff; display: none; }
+      #btn-ejemplo:hover     { background: #3f6080; }
+      #btn-guia:hover        { background: #a86000; }
+      #btn-pdf:hover         { background: #115a28; }
+      #btn-limpiar:hover     { background: #811; }
+      #btn-quitar-logo:hover { background: #444; }
+
+      #contador { font-size: 11px; opacity: 0.75; padding-bottom: 2px; }
+
+      #aviso {
+        width: 100%; background: #BDD7EE; color: #1F3864;
+        font-size: 11px; padding: 6px 10px; border-radius: 3px; display: none;
+      }
+      #aviso.visible { display: block; }
+      #aviso.error   { background: #f8d7da; color: #721c24; }
+
+      #logo-preview-panel {
+        display: none; background: #1a4a2a; padding: 6px 12px;
+        border-radius: 3px; font-size: 11px; color: #aef0c0;
+        align-items: center; gap: 8px;
+      }
+      #logo-preview-panel.visible { display: flex; }
+      #logo-miniatura { height: 28px; max-width: 80px; object-fit: contain; border: 1px solid #4a9a6a; background: #fff; padding: 2px; }
+
+      #instrucciones {
+        background: #eef4fb; border-left: 4px solid var(--color-secundario);
+        padding: 12px 24px; font-size: 11.5px; color: #222; line-height: 1.75;
+      }
+      #instrucciones h2 { font-size: 12.5px; color: var(--color-primario); margin: 0 0 6px; }
+      #instrucciones ul { margin: 0; padding-left: 18px; }
+      #instrucciones code { background: #d8e8f7; padding: 1px 5px; border-radius: 2px; font-size: 11px; }
+
+      #zona-hojas { padding: 24px 20px; display: flex; flex-direction: column; align-items: center; gap: 32px; }
+
+      #calibracion {
+        background: #fff8e1; border-left: 4px solid #d08000;
+        padding: 12px 24px; font-size: 11.5px; color: #222; line-height: 1.7;
+      }
+      #calibracion h2 { font-size: 12.5px; color: #7a5000; margin: 0 0 6px; }
+      #calibracion table { border-collapse: collapse; width: 100%; max-width: 720px; margin-top: 8px; font-size: 11px; }
+      #calibracion th { background: #d08000; color: #fff; padding: 5px 10px; text-align: left; }
+      #calibracion td { padding: 5px 10px; border-bottom: 1px solid #e8d8a0; }
+      #calibracion tr:nth-child(even) td { background: #fdf6da; }
+    }
+
+    /* ============================================================
+       HOJA DE IMPRESION
+    ============================================================ */
+    .hoja {
+      width:  var(--hoja-ancho);
+      height: var(--hoja-alto);
+      padding-top:    var(--margen-superior);
+      padding-bottom: var(--margen-inferior);
+      padding-left:   var(--margen-izquierdo);
+      padding-right:  var(--margen-derecho);
+      box-sizing: border-box;
+      background: #fff;
+      position: relative;
+    }
+    @media screen { .hoja { box-shadow: 0 3px 16px rgba(0,0,0,0.16); } }
+
+    /* ============================================================
+       GRILLA: 2 columnas x 14 filas = 28 etiquetas por hoja
+    ============================================================ */
+    .grilla {
+      display: grid;
+      grid-template-columns: repeat(var(--columnas), var(--etiqueta-ancho));
+      grid-template-rows:    repeat(var(--filas),    var(--etiqueta-alto));
+      column-gap: var(--gap-horizontal);
+      row-gap:    var(--gap-vertical);
+      width: fit-content;
+    }
+
+    /* ============================================================
+       ETIQUETA INDIVIDUAL
+    ============================================================ */
+    .etiqueta {
+      width:  var(--etiqueta-ancho);
+      height: var(--etiqueta-alto);
+      box-sizing: border-box;
+      overflow: hidden;
+      padding: 0.8mm 2.5mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0;
+      border: none;
+    }
+
+    .etiqueta.con-logo {
+      flex-direction: row;
+      align-items: center;
+      gap: 2mm;
+      padding: 0.8mm 2mm;
+    }
+
+    .etiqueta-logo {
+      display: none;
+      flex-shrink: 0;
+      height: var(--logo-alto);
+      width: auto;
+      max-width: 20mm;
+      object-fit: contain;
+    }
+    .etiqueta.con-logo .etiqueta-logo { display: block; }
+
+    .etiqueta-texto {
+      display: flex; flex-direction: column; justify-content: center;
+      gap: 0; flex: 1; min-width: 0;
+    }
+
+    .etiqueta-numero {
+      font-family: var(--fuente);
+      font-size: var(--tam-numero);
+      font-weight: bold;
+      line-height: 1.15;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #000;
+    }
+
+    .etiqueta-linea {
+      height: 0.3mm;
+      background: #444;
+      margin: 0.4mm 0;
+    }
+
+    .etiqueta-nombre {
+      font-family: var(--fuente);
+      font-size: var(--tam-nombre);
+      font-weight: normal;
+      line-height: 1.15;
+      overflow: hidden;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      color: #000;
+    }
+
+    .etiqueta.vacia .etiqueta-linea { display: none; }
+
+    /* Recuadro de inicial del apellido (lado derecho de la etiqueta) */
+    .etiqueta-inicial {
+      flex-shrink: 0;
+      width: 11mm;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 9pt;
+      font-weight: bold;
+      color: #fff;
+      border-radius: 0;
+      margin-left: 1.5mm;
+    }
+    /* Inicial oscura necesita texto oscuro */
+    .etiqueta-inicial.texto-oscuro { color: #333 !important; }
+
+    /* La etiqueta base pasa a fila para acomodar el recuadro a la derecha */
+    .etiqueta {
+      flex-direction: row !important;
+      align-items: stretch !important;
+      padding: 0 0 0 2mm !important;
+      gap: 0 !important;
+    }
+    .etiqueta-texto {
+      flex: 1;
+      min-width: 0;
+      padding: 0.8mm 0;
+    }
+    /* Con logo: el logo va antes del texto, el recuadro sigue al final */
+    .etiqueta.con-logo {
+      gap: 0 !important;
+      padding: 0 0 0 1.5mm !important;
+    }
+    .etiqueta.con-logo .etiqueta-logo {
+      margin-right: 1.5mm;
+      align-self: center;
+    }
+
+    /* Linea de corte para guillotina: borde inferior permanente en impresion y PDF.
+       Sirve de guia de corte horizontal. Color gris claro para no interferir
+       con el contenido pero visible al cortar con guillotina.               */
+    .etiqueta {
+      border-bottom: 0.4px solid #aaaaaa;
+    }
+
+    body.modo-guia .etiqueta { border: 0.5px dashed var(--color-guia) !important; }
+    body.modo-guia .hoja     { border: 1px solid #cc0000; }
+
+    /* ============================================================
+       IMPRESION / PDF
+       Carta horizontal sin margenes del navegador.
+       El PDF reducido ocurre cuando el navegador agrega sus propios
+       margenes encima del @page. Para evitarlo:
+       - margin: 0mm en @page
+       - El usuario DEBE seleccionar Margenes = Ninguno en el dialogo
+    ============================================================ */
+    @media print {
+      @page {
+        size: letter landscape;
+        margin: 0mm;
+      }
+      html {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      html, body { margin: 0; padding: 0; background: transparent; }
+      #panel-control, #instrucciones, #calibracion, #modal-instrucciones-pdf { display: none !important; }
+      #zona-hojas { padding: 0; gap: 0; display: block; }
+      .hoja { page-break-after: always; break-after: page; box-shadow: none; margin: 0; }
+      /* Conservar linea de corte en impresion */
+      .etiqueta { border-bottom: 0.4px solid #aaaaaa !important; }
+      body.modo-guia .etiqueta { border: 0.3px dashed #999 !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     PANEL DE CONTROL
+============================================================ -->
+<div id="panel-control">
+  <h1>Etiquetas Expedientes Laborales - KONE Mexico
+    <span>Carta Horizontal | 125mm x 13mm | 2 col x 15 filas | 30 etiquetas por hoja</span>
+  </h1>
+
+  <!-- Datos CSV -->
+  <div class="grupo-control">
+    <label for="archivo-csv">Cargar CSV (columna: ETIQUETA)</label>
+    <input type="file" id="archivo-csv" accept=".csv,.txt" />
+  </div>
+
+  <!-- Logo -->
+  <div class="grupo-control">
+    <label for="archivo-logo">Logo (PNG o JPG, opcional)</label>
+    <input type="file" id="archivo-logo" accept="image/png,image/jpeg,image/gif,image/svg+xml" />
+  </div>
+
+  <div class="separador"></div>
+
+  <!-- Tipo de fuente -->
+  <div class="grupo-control">
+    <label for="sel-fuente">Tipo de letra</label>
+    <select id="sel-fuente">
+      <option value="Arial, Helvetica, sans-serif" selected>Arial</option>
+      <option value="'Times New Roman', Times, serif">Times New Roman</option>
+      <option value="'Courier New', Courier, monospace">Courier New</option>
+      <option value="Tahoma, Geneva, sans-serif">Tahoma</option>
+      <option value="Verdana, Geneva, sans-serif">Verdana</option>
+      <option value="Georgia, serif">Georgia</option>
+      <option value="Calibri, Candara, sans-serif">Calibri</option>
+    </select>
+  </div>
+
+  <!-- Tamaño numero de empleado -->
+  <div class="grupo-control">
+    <label for="tam-numero">Tamano numero (pt)</label>
+    <input type="number" id="tam-numero" value="9" min="6" max="18" step="0.5" />
+  </div>
+
+  <!-- Tamaño nombre -->
+  <div class="grupo-control">
+    <label for="tam-nombre">Tamano nombre (pt)</label>
+    <input type="number" id="tam-nombre" value="8.5" min="6" max="18" step="0.5" />
+  </div>
+
+  <div class="separador"></div>
+
+  <!-- Botones -->
+  <button class="btn" id="btn-quitar-logo">Quitar logo</button>
+  <button class="btn" id="btn-ejemplo">Cargar ejemplo</button>
+  <button class="btn" id="btn-guia">Activar guia de corte</button>
+  <button class="btn" id="btn-pdf">Exportar PDF</button>
+  <button class="btn" id="btn-limpiar">Limpiar todo</button>
+
+  <span id="contador">Sin datos cargados</span>
+
+  <div id="logo-preview-panel">
+    <img id="logo-miniatura" src="" alt="Logo" />
+    <span id="logo-nombre-archivo"></span>
+  </div>
+
+  <div id="aviso"></div>
+</div>
+
+<!-- MODAL: instrucciones para exportar PDF correctamente -->
+<div id="modal-instrucciones-pdf" style="
+  display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.55); z-index:9999; align-items:center; justify-content:center;">
+  <div style="
+    background:#fff; border-radius:6px; max-width:480px; width:92%; padding:28px 32px;
+    font-family:Arial,sans-serif; font-size:13px; color:#222; box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+    <div style="font-size:15px;font-weight:bold;color:#1F3864;margin-bottom:14px;">
+      Antes de guardar el PDF
+    </div>
+    <p style="margin:0 0 10px;">En el dialogo que se abrira a continuacion, configura exactamente lo siguiente para que el PDF salga en tamano real:</p>
+    <ol style="margin:0 0 16px;padding-left:20px;line-height:2;">
+      <li>Destino: <strong>Guardar como PDF</strong></li>
+      <li>Orientacion: <strong>Horizontal (Landscape)</strong></li>
+      <li>Tamano de papel: <strong>Carta</strong></li>
+      <li>Margenes: <strong>Ninguno</strong></li>
+      <li>Escala: <strong>100</strong> (no usar "Ajustar")</li>
+      <li>Cabeceras y pies de pagina: <strong>desactivar</strong></li>
+    </ol>
+    <p style="margin:0 0 18px;font-size:11.5px;color:#666;">
+      Si no seleccionas Margenes = Ninguno, el navegador agrega espacio propio y la imagen se reduce automaticamente.
+    </p>
+    <div style="display:flex;gap:12px;justify-content:flex-end;">
+      <button id="modal-cancelar" style="
+        padding:8px 18px;border:1px solid #aaa;border-radius:3px;
+        background:#fff;font-size:12px;cursor:pointer;">Cancelar</button>
+      <button id="modal-confirmar" style="
+        padding:8px 18px;border:none;border-radius:3px;
+        background:#1a7a3a;color:#fff;font-size:12px;font-weight:bold;cursor:pointer;">
+        Entendido, abrir dialogo
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- INSTRUCCIONES -->
+<div id="instrucciones">
+  <h2>Instrucciones de uso</h2>
+  <ul>
+    <li><strong>Paso 1.</strong> Tu CSV debe tener una columna con encabezado <code>ETIQUETA</code>. Cada celda con formato <code>numero-nombre</code>, por ejemplo: <code>64175695-Abad Garcia Mario Isaac</code>.</li>
+    <li><strong>Paso 2.</strong> Exporta desde Excel como CSV UTF-8. Si los caracteres especiales (n con tilde, acentos) salen mal, la herramienta reintenta automaticamente con codificacion Windows-1252.</li>
+    <li><strong>Paso 3.</strong> Ajusta el tipo y tamano de letra desde los controles del panel. Los cambios se aplican en tiempo real en la vista previa.</li>
+    <li><strong>Paso 4.</strong> Haz clic en <strong>Exportar PDF</strong>. En el dialogo del navegador selecciona destino = Guardar como PDF, escala = 100%, margenes = Ninguno, orientacion = Horizontal.</li>
+    <li><strong>Nota.</strong> El PDF generado es un archivo fijo que no puede modificarse desde esta herramienta.</li>
+  </ul>
+</div>
+
+<!-- ZONA DE HOJAS -->
+<div id="zona-hojas"></div>
+
+<!-- AJUSTES FINOS -->
+<div id="calibracion">
+  <h2>Ajustes finos de calibracion</h2>
+  <p>Si la impresion sale corrida, edita las variables en la seccion <code>:root</code> al inicio del archivo.</p>
+  <table>
+    <tr><th>Sintoma</th><th>Variable</th><th>Accion</th></tr>
+    <tr><td>Etiquetas mas arriba de lo esperado</td><td><code>--margen-superior</code></td><td>Aumentar (ej. 5mm a 7mm)</td></tr>
+    <tr><td>Etiquetas mas abajo de lo esperado</td><td><code>--margen-superior</code></td><td>Reducir (ej. 5mm a 3mm)</td></tr>
+    <tr><td>Etiquetas corridas a la derecha</td><td><code>--margen-izquierdo</code></td><td>Aumentar (ej. 7mm a 9mm)</td></tr>
+    <tr><td>Etiquetas corridas a la izquierda</td><td><code>--margen-izquierdo</code></td><td>Reducir (ej. 7mm a 5mm)</td></tr>
+    <tr><td>Texto invade la etiqueta de abajo</td><td><code>--etiqueta-alto</code></td><td>Reducir (ej. 13mm a 12.5mm)</td></tr>
+    <tr><td>Columnas muy separadas o muy juntas</td><td><code>--gap-horizontal</code></td><td>Ajustar en mm</td></tr>
+    <tr><td>Logo demasiado grande o pequeno</td><td><code>--logo-alto</code></td><td>Ajustar en mm (ej. 8mm a 6mm)</td></tr>
+    <tr><td>PDF sale en vertical en lugar de horizontal</td><td>Dialogo de impresion</td><td>Seleccionar orientacion = Horizontal</td></tr>
+    <tr><td>Ultima fila cortada</td><td><code>--margen-inferior</code></td><td>Aumentar el valor</td></tr>
+  </table>
+  <p style="margin-top:8px;font-size:10.5px;color:#777;">Se recomienda prueba en papel blanco con guia de corte antes de imprimir en hoja real.</p>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+<script>
+  /* ----------------------------------------------------------
+     DATOS DE EJEMPLO
+  ---------------------------------------------------------- */
+  const EJEMPLO = [
+    { etiqueta: "10045231-Garcia Lopez Juan Carlos" },
+    { etiqueta: "10045232-Martinez Ruiz Ana Lucia" },
+    { etiqueta: "32100006-Peralta Maya Carlos Ignacio" },
+    { etiqueta: "32100009-Vazquez Orihuela Carlos" },
+    { etiqueta: "32100017-Hernandez Rodriguez Gelacio Damian" },
+    { etiqueta: "32100031-Mainfelt Moguel Victor Francisco" },
+    { etiqueta: "32100039-Gutierrez Castillo Eduardo" },
+    { etiqueta: "32100042-Vizuet Vizuet Oscar" },
+    { etiqueta: "32100055-Munoz Espinoza Jose de Jesus" },
+    { etiqueta: "32100061-Ortuno Ramos Patricia Nohemi" }
+  ];
+
+  /* ----------------------------------------------------------
+     ESTADO GLOBAL
+  ---------------------------------------------------------- */
+  let datos       = [];
+  let logoDataUrl = null;
+  let guiaActiva  = false;
+  const POR_HOJA  = 30;
+
+  /* ----------------------------------------------------------
+     REFERENCIAS DOM
+  ---------------------------------------------------------- */
+  const zonaHojas     = document.getElementById("zona-hojas");
+  const archivoCsv    = document.getElementById("archivo-csv");
+  const archivoLogo   = document.getElementById("archivo-logo");
+  const contador      = document.getElementById("contador");
+  const aviso         = document.getElementById("aviso");
+  const selFuente     = document.getElementById("sel-fuente");
+  const inputNumero   = document.getElementById("tam-numero");
+  const inputNombre   = document.getElementById("tam-nombre");
+  const btnEjemplo    = document.getElementById("btn-ejemplo");
+  const btnGuia       = document.getElementById("btn-guia");
+  const btnPdf        = document.getElementById("btn-pdf");
+  const btnLimpiar    = document.getElementById("btn-limpiar");
+  const btnQuitarLogo = document.getElementById("btn-quitar-logo");
+  const logoPreview   = document.getElementById("logo-preview-panel");
+  const logoMiniatura = document.getElementById("logo-miniatura");
+  const logoNombreEl  = document.getElementById("logo-nombre-archivo");
+  const raiz          = document.documentElement;
+
+  /* ----------------------------------------------------------
+     APLICAR TIPOGRAFIA
+     Actualiza las variables CSS en :root en tiempo real.
+     Esto afecta tanto la vista previa como la impresion/PDF.
+  ---------------------------------------------------------- */
+  function aplicarTipografia() {
+    raiz.style.setProperty("--fuente",      selFuente.value);
+    raiz.style.setProperty("--tam-numero",  inputNumero.value + "pt");
+    raiz.style.setProperty("--tam-nombre",  inputNombre.value + "pt");
+  }
+
+  /* ----------------------------------------------------------
+     PARSEAR CSV
+  ---------------------------------------------------------- */
+  function parsearTextoCSV(texto) {
+    const lineas = texto.trim().split(/\r?\n/);
+    if (lineas.length < 2) return null;
+
+    const primera = lineas[0];
+    let sep = ",";
+    const cuenta = (s) => (primera.match(new RegExp("\\" + s, "g")) || []).length;
+    if (cuenta(";") > cuenta(",")) sep = ";";
+    else if (cuenta("\t") > cuenta(",")) sep = "\t";
+
+    const encabezados = primera.split(sep).map(h =>
+      h.trim().replace(/^"|"$/g, "").toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, "_")
+    );
+
+    const idxEtiqueta = encabezados.findIndex(e => e === "etiqueta" || e === "etiquetas");
+
+    if (idxEtiqueta === -1) {
+      const encOriginal = primera.split(sep).map(h => h.trim().replace(/^"|"$/g, ""));
+      return { error: true, encabezados: encOriginal };
+    }
+
+    const resultado = [];
+    for (let i = 1; i < lineas.length; i++) {
+      if (!lineas[i].trim()) continue;
+      const vals = lineas[i].split(sep).map(v => v.trim().replace(/^"|"$/g, ""));
+      resultado.push({ etiqueta: vals[idxEtiqueta] || "" });
+    }
+    return resultado;
+  }
+
+  function leerArchivoCSV(archivo, callback) {
+    const lector1 = new FileReader();
+    lector1.onload = function(ev) {
+      const texto = ev.target.result;
+      if (texto.includes("\uFFFD") || texto.includes("Ã") || texto.includes("â")) {
+        const lector2 = new FileReader();
+        lector2.onload = function(ev2) { callback(ev2.target.result); };
+        lector2.readAsText(archivo, "windows-1252");
+      } else {
+        callback(texto);
+      }
+    };
+    lector1.readAsText(archivo, "UTF-8");
+  }
+
+  /* ----------------------------------------------------------
+     CREAR ETIQUETA
+  ---------------------------------------------------------- */
+  /* ----------------------------------------------------------
+     PALETA OPCION A: saltos entre familias de color
+     Letras consecutivas nunca comparten familia cromatica.
+  ---------------------------------------------------------- */
+  const PALETA = {
+    A: { bg: "#E53935", oscuro: false },
+    B: { bg: "#1E88E5", oscuro: false },
+    C: { bg: "#43A047", oscuro: false },
+    D: { bg: "#FB8C00", oscuro: false },
+    E: { bg: "#8E24AA", oscuro: false },
+    F: { bg: "#00897B", oscuro: false },
+    G: { bg: "#D81B60", oscuro: false },
+    H: { bg: "#546E7A", oscuro: false },
+    I: { bg: "#FDD835", oscuro: true  },
+    J: { bg: "#5E35B1", oscuro: false },
+    K: { bg: "#F4511E", oscuro: false },
+    L: { bg: "#039BE5", oscuro: false },
+    M: { bg: "#6D4C41", oscuro: false },
+    N: { bg: "#7CB342", oscuro: false },
+    O: { bg: "#AB47BC", oscuro: false },
+    P: { bg: "#FFB300", oscuro: true  },
+    Q: { bg: "#3949AB", oscuro: false },
+    R: { bg: "#26C6DA", oscuro: false },
+    S: { bg: "#C0CA33", oscuro: true  },
+    T: { bg: "#E91E63", oscuro: false },
+    U: { bg: "#00ACC1", oscuro: false },
+    V: { bg: "#FF7043", oscuro: false },
+    W: { bg: "#1B5E20", oscuro: false },
+    X: { bg: "#9C27B0", oscuro: false },
+    Y: { bg: "#F57F17", oscuro: false },
+    Z: { bg: "#0D47A1", oscuro: false }
+  };
+
+  function obtenerColorInicial(nombre) {
+    if (!nombre) return { bg: "#cccccc", oscuro: true };
+    const letra = nombre.trim().charAt(0).toUpperCase()
+                    .normalize("NFD").replace(/[̀-ͯ]/g, "");
+    return PALETA[letra] || { bg: "#9E9E9E", oscuro: false };
+  }
+
+  function crearEtiqueta(reg) {
+    const div = document.createElement("div");
+
+    if (!reg) {
+      div.className = "etiqueta vacia";
+      return div;
+    }
+
+    div.className = logoDataUrl ? "etiqueta con-logo" : "etiqueta";
+
+    const valor    = reg.etiqueta || "";
+    const posGuion = valor.indexOf("-");
+    const numero   = posGuion !== -1 ? valor.substring(0, posGuion).trim() : valor;
+    const nombre   = posGuion !== -1 ? valor.substring(posGuion + 1).trim() : "";
+
+    /* Logo (opcional, lado izquierdo) */
+    const img = document.createElement("img");
+    img.className = "etiqueta-logo";
+    if (logoDataUrl) { img.src = logoDataUrl; img.alt = ""; }
+
+    /* Bloque de texto (nombre arriba, numero abajo) */
+    const bloque = document.createElement("div");
+    bloque.className = "etiqueta-texto";
+
+    const nom = document.createElement("div");
+    nom.className = "etiqueta-nombre";
+    nom.textContent = nombre;
+
+    const lin = document.createElement("div");
+    lin.className = "etiqueta-linea";
+
+    const num = document.createElement("div");
+    num.className = "etiqueta-numero";
+    num.textContent = numero;
+
+    bloque.appendChild(nom);
+    bloque.appendChild(lin);
+    bloque.appendChild(num);
+
+    /* Recuadro de inicial del apellido (lado derecho) */
+    const color = obtenerColorInicial(nombre);
+    const inicial = document.createElement("div");
+    inicial.className = "etiqueta-inicial" + (color.oscuro ? " texto-oscuro" : "");
+    inicial.style.background = color.bg;
+    /* La inicial es la primera letra del nombre (= apellido paterno en formato KONE) */
+    const letraInicial = nombre.trim().charAt(0).toUpperCase()
+                          .normalize("NFD").replace(/[̀-ͯ]/g, "");
+    inicial.textContent = letraInicial;
+
+    div.appendChild(img);
+    div.appendChild(bloque);
+    div.appendChild(inicial);
+
+    return div;
+  }
+
+  /* ----------------------------------------------------------
+     GENERAR HOJAS
+  ---------------------------------------------------------- */
+  function generarHojas(lista) {
+    zonaHojas.innerHTML = "";
+    if (!lista || lista.length === 0) { contador.textContent = "Sin datos cargados"; return; }
+
+    let idx = 0, numHoja = 0;
+
+    while (idx < lista.length) {
+      numHoja++;
+      const hoja = document.createElement("div");
+      hoja.className = "hoja";
+      const grilla = document.createElement("div");
+      grilla.className = "grilla";
+
+      for (let pos = 0; pos < POR_HOJA; pos++) {
+        grilla.appendChild(crearEtiqueta(idx < lista.length ? lista[idx++] : null));
+      }
+
+      hoja.appendChild(grilla);
+      zonaHojas.appendChild(hoja);
+    }
+
+    contador.textContent = lista.length + " empleado(s) - " + numHoja + " hoja(s)";
+  }
+
+  /* ----------------------------------------------------------
+     AVISOS
+  ---------------------------------------------------------- */
+  function mostrarAviso(msg, esError) {
+    aviso.textContent = msg;
+    aviso.className = "visible" + (esError ? " error" : "");
+  }
+  function ocultarAviso() { aviso.className = ""; aviso.textContent = ""; }
+
+  /* ----------------------------------------------------------
+     EXPORTAR PDF
+  ---------------------------------------------------------- */
+  /* ----------------------------------------------------------
+     MODAL PDF
+  ---------------------------------------------------------- */
+  const modalPdf      = document.getElementById("modal-instrucciones-pdf");
+  const modalCancelar = document.getElementById("modal-cancelar");
+  const modalConfirmar= document.getElementById("modal-confirmar");
+
+  function abrirModalPDF() {
+    modalPdf.style.display = "flex";
+  }
+
+  function cerrarModalPDF() {
+    modalPdf.style.display = "none";
+  }
+
+  function ejecutarImpresion() {
+    cerrarModalPDF();
+    const guiaEstaba = guiaActiva;
+    if (guiaActiva) {
+      guiaActiva = false;
+      document.body.classList.remove("modo-guia");
+      btnGuia.textContent = "Activar guia de corte";
+    }
+    setTimeout(function() {
+      window.print();
+      if (guiaEstaba) {
+        guiaActiva = true;
+        document.body.classList.add("modo-guia");
+        btnGuia.textContent = "Desactivar guia de corte";
+      }
+    }, 120);
+  }
+
+  modalCancelar.addEventListener("click", cerrarModalPDF);
+  modalConfirmar.addEventListener("click", ejecutarImpresion);
+
+  // Cerrar modal al hacer clic fuera del recuadro
+  modalPdf.addEventListener("click", function(e) {
+    if (e.target === modalPdf) cerrarModalPDF();
+  });
+
+  function exportarPDF() {
+    if (datos.length === 0) {
+      alert("Carga un CSV o usa los datos de ejemplo antes de exportar.");
+      return;
+    }
+    abrirModalPDF();
+  }
+
+  /* ----------------------------------------------------------
+     EVENTOS - tipografia (tiempo real, sin regenerar hojas)
+  ---------------------------------------------------------- */
+  selFuente.addEventListener("change",  aplicarTipografia);
+  inputNumero.addEventListener("input", aplicarTipografia);
+  inputNombre.addEventListener("input", aplicarTipografia);
+
+  /* ----------------------------------------------------------
+     EVENTOS - datos y acciones
+  ---------------------------------------------------------- */
+  archivoCsv.addEventListener("change", function(e) {
+    const archivo = e.target.files[0];
+    if (!archivo) return;
+    leerArchivoCSV(archivo, function(texto) {
+      const resultado = parsearTextoCSV(texto);
+      if (!resultado) { mostrarAviso("El archivo no tiene datos o encabezados validos.", true); return; }
+      if (resultado.error) {
+        mostrarAviso("Columna no encontrada. El archivo tiene: " + resultado.encabezados.join(", ") + ". Se requiere: ETIQUETA.", true);
+        return;
+      }
+      datos = resultado;
+      ocultarAviso();
+      mostrarAviso("Archivo cargado: " + datos.length + " registros.", false);
+      generarHojas(datos);
+    });
+  });
+
+  archivoLogo.addEventListener("change", function(e) {
+    const archivo = e.target.files[0];
+    if (!archivo) return;
+    const lector = new FileReader();
+    lector.onload = function(ev) {
+      logoDataUrl = ev.target.result;
+      logoMiniatura.src = logoDataUrl;
+      logoNombreEl.textContent = archivo.name;
+      logoPreview.classList.add("visible");
+      btnQuitarLogo.style.display = "inline-block";
+      if (datos.length > 0) generarHojas(datos);
+    };
+    lector.readAsDataURL(archivo);
+  });
+
+  btnQuitarLogo.addEventListener("click", function() {
+    logoDataUrl = null;
+    archivoLogo.value = "";
+    logoPreview.classList.remove("visible");
+    btnQuitarLogo.style.display = "none";
+    if (datos.length > 0) generarHojas(datos);
+  });
+
+  btnEjemplo.addEventListener("click", function() {
+    datos = EJEMPLO;
+    ocultarAviso();
+    mostrarAviso("Datos de ejemplo cargados: 10 registros.", false);
+    generarHojas(datos);
+  });
+
+  btnGuia.addEventListener("click", function() {
+    guiaActiva = !guiaActiva;
+    document.body.classList.toggle("modo-guia", guiaActiva);
+    btnGuia.textContent = guiaActiva ? "Desactivar guia de corte" : "Activar guia de corte";
+  });
+
+  btnPdf.addEventListener("click", exportarPDF);
+
+  btnLimpiar.addEventListener("click", function() {
+    datos = [];
+    logoDataUrl = null;
+    zonaHojas.innerHTML = "";
+    archivoCsv.value = "";
+    archivoLogo.value = "";
+    logoPreview.classList.remove("visible");
+    btnQuitarLogo.style.display = "none";
+    contador.textContent = "Sin datos cargados";
+    ocultarAviso();
+  });
+
+  /* Aplicar tipografia inicial al cargar */
+  aplicarTipografia();
+</script>
+</body>
+</html>
