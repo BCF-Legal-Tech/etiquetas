@@ -338,6 +338,9 @@
 
     .separador { width: 1px; background: rgba(255,255,255,0.2); align-self: stretch; margin: 0 4px; }
 
+    #sel-modelo { min-width: 280px; font-size: 12px; padding: 5px 8px; border: 1px solid #8db4d8; border-radius: 3px; background: #fff; color: #111; cursor: pointer; }
+    .badge-etiq { display: inline-block; background: rgba(255,255,255,0.15); border-radius: 3px; font-size: 10px; padding: 1px 6px; margin-left: 6px; vertical-align: middle; }
+
     .btn {
       padding: 8px 16px; border: none; border-radius: 3px;
       font-size: 12px; font-weight: bold; cursor: pointer; white-space: nowrap;
@@ -564,8 +567,22 @@
 
   <div id="panel-control">
     <h1>Etiquetas de Expedientes Laborales
-      <span>Carta Horizontal | 125mm x 13mm | 2 col x 15 filas | 30 etiquetas por hoja</span>
+      <span id="panel-subtitulo">Carta Horizontal | 125mm x 13mm | 2 col x 15 filas | 30 etiquetas por hoja</span>
     </h1>
+    <div class="grupo-control" style="width:100%;">
+      <label for="sel-modelo">Modelo de etiqueta Janel</label>
+      <select id="sel-modelo">
+        <option value="KONE-EXP"  selected>KONE Expedientes - 1.3 x 12.5 cm | Carta Horizontal | 30 etiq/hoja</option>
+        <option value="J-5267" >J-5267 - 1.3 x 4.5 cm | Carta Vertical | 80 etiq/hoja</option>
+        <option value="J-5266C">J-5266C - 1.7 x 8.7 cm | Carta Vertical | 30 etiq/hoja</option>
+        <option value="J-5260" >J-5260 - 2.5 x 6.7 cm | Carta Vertical | 30 etiq/hoja</option>
+        <option value="J-5261" >J-5261 - 2.5 x 10.2 cm | Carta Vertical | 20 etiq/hoja</option>
+        <option value="J-5262" >J-5262 - 3.4 x 10.2 cm | Carta Vertical | 16 etiq/hoja</option>
+        <option value="J-5163" >J-5163 - 5.1 x 10.2 cm | Carta Vertical | 10 etiq/hoja</option>
+        <option value="J-5164" >J-5164 - 8.5 x 10.2 cm | Carta Vertical | 6 etiq/hoja</option>
+      </select>
+    </div>
+    <div class="separador" style="width:100%;height:1px;background:rgba(255,255,255,0.1);margin:2px 0;"></div>
     <div class="grupo-control">
       <label for="archivo-csv">Cargar CSV (columna: ETIQUETA)</label>
       <input type="file" id="archivo-csv" accept=".csv,.txt" />
@@ -641,18 +658,7 @@
 
   <div id="zona-hojas"></div>
 
-  <div id="calibracion">
-    <h2>Ajustes finos de calibracion</h2>
-    <table>
-      <tr><th>Sintoma</th><th>Variable CSS</th><th>Accion</th></tr>
-      <tr><td>Etiquetas mas arriba de lo esperado</td><td><code>--margen-superior</code></td><td>Aumentar (ej. 5mm a 7mm)</td></tr>
-      <tr><td>Etiquetas mas abajo de lo esperado</td><td><code>--margen-superior</code></td><td>Reducir (ej. 5mm a 3mm)</td></tr>
-      <tr><td>Etiquetas corridas a la derecha</td><td><code>--margen-izquierdo</code></td><td>Aumentar (ej. 7mm a 9mm)</td></tr>
-      <tr><td>Etiquetas corridas a la izquierda</td><td><code>--margen-izquierdo</code></td><td>Reducir (ej. 7mm a 5mm)</td></tr>
-      <tr><td>Texto invade etiqueta de abajo</td><td><code>--etiqueta-alto</code></td><td>Reducir (ej. 13mm a 12.5mm)</td></tr>
-      <tr><td>PDF sale en vertical</td><td>Dialogo de impresion</td><td>Seleccionar orientacion = Horizontal</td></tr>
-    </table>
-  </div>
+
 
   <footer style="background:#f8f9fb;border-top:1px solid #e2e6ed;padding:10px 20px;text-align:center;font-family:Arial,Helvetica,sans-serif;font-size:10.5px;color:#a0a8b4;line-height:1.6;">
     &copy; <span id="footer-anio"></span> BCF MG Consultoria, S.C.. Herramienta de uso interno y confidencial.
@@ -1050,8 +1056,54 @@ const EJEMPLO = [
   { etiqueta: "32100061-Ortuno Ramos Patricia Nohemi" }
 ];
 
-let datos = [], logoDataUrl = null, guiaActiva = false;
-const POR_HOJA = 30;
+/* ================================================================
+     CONFIGURACIONES DE MODELOS JANEL
+  ================================================================ */
+  const MODELOS = {
+    "KONE-EXP": { label:"KONE Exp 1.3x12.5cm", alto:13,  ancho:125, cols:2, filas:15, orient:"landscape", marSup:5,   marInf:5,   marIzq:7,    marDer:7,    gapH:7,   gapV:0, porHoja:30 },
+    "J-5267":   { label:"J-5267 1.3x4.5cm",    alto:13,  ancho:45,  cols:4, filas:20, orient:"portrait",  marSup:7.9, marInf:7.9, marIzq:4.75, marDer:4.75, gapH:2.5, gapV:0, porHoja:80 },
+    "J-5266C":  { label:"J-5266C 1.7x8.7cm",   alto:17,  ancho:87,  cols:2, filas:15, orient:"portrait",  marSup:6,   marInf:6,   marIzq:7,    marDer:7,    gapH:3,   gapV:0, porHoja:30 },
+    "J-5260":   { label:"J-5260 2.5x6.7cm",    alto:25,  ancho:67,  cols:3, filas:10, orient:"portrait",  marSup:6,   marInf:6,   marIzq:4,    marDer:4,    gapH:3,   gapV:0, porHoja:30 },
+    "J-5261":   { label:"J-5261 2.5x10.2cm",   alto:25,  ancho:102, cols:2, filas:10, orient:"portrait",  marSup:6,   marInf:6,   marIzq:5,    marDer:5,    gapH:3,   gapV:0, porHoja:20 },
+    "J-5262":   { label:"J-5262 3.4x10.2cm",   alto:34,  ancho:102, cols:2, filas:8,  orient:"portrait",  marSup:5,   marInf:5,   marIzq:5,    marDer:5,    gapH:3,   gapV:0, porHoja:16 },
+    "J-5163":   { label:"J-5163 5.1x10.2cm",   alto:51,  ancho:102, cols:2, filas:5,  orient:"portrait",  marSup:5,   marInf:5,   marIzq:5,    marDer:5,    gapH:3,   gapV:0, porHoja:10 },
+    "J-5164":   { label:"J-5164 8.5x10.2cm",   alto:85,  ancho:102, cols:2, filas:3,  orient:"portrait",  marSup:5,   marInf:5,   marIzq:5,    marDer:5,    gapH:3,   gapV:0, porHoja:6  }
+  };
+
+  let modeloActual = MODELOS["KONE-EXP"];
+
+  function aplicarModelo(id) {
+    const m = MODELOS[id]; if (!m) return;
+    modeloActual = m;
+    const r = document.documentElement;
+    if (m.orient === "landscape") {
+      r.style.setProperty("--hoja-ancho","279.4mm");
+      r.style.setProperty("--hoja-alto", "215.9mm");
+    } else {
+      r.style.setProperty("--hoja-ancho","215.9mm");
+      r.style.setProperty("--hoja-alto", "279.4mm");
+    }
+    r.style.setProperty("--etiqueta-alto",   m.alto  + "mm");
+    r.style.setProperty("--etiqueta-ancho",  m.ancho + "mm");
+    r.style.setProperty("--columnas",        m.cols);
+    r.style.setProperty("--filas",           m.filas);
+    r.style.setProperty("--margen-superior", m.marSup + "mm");
+    r.style.setProperty("--margen-inferior", m.marInf + "mm");
+    r.style.setProperty("--margen-izquierdo",m.marIzq + "mm");
+    r.style.setProperty("--margen-derecho",  m.marDer + "mm");
+    r.style.setProperty("--gap-horizontal",  m.gapH   + "mm");
+    r.style.setProperty("--gap-vertical",    m.gapV   + "mm");
+    let st = document.getElementById("style-page-din");
+    if (!st) { st = document.createElement("style"); st.id="style-page-din"; document.head.appendChild(st); }
+    st.textContent = "@media print { @page { size: letter " + m.orient + "; margin: 0mm; } }";
+    const ol = m.orient==="landscape" ? "Horizontal" : "Vertical";
+    const sub = document.getElementById("panel-subtitulo");
+    if (sub) sub.textContent = "Carta "+ol+" | "+m.alto+"mm x "+m.ancho+"mm | "+m.cols+" col x "+m.filas+" filas | "+m.porHoja+" etiquetas por hoja";
+    if (datos && datos.length > 0) generarHojas(datos);
+  }
+
+  let datos = [], logoDataUrl = null, guiaActiva = false;
+  let POR_HOJA = 30;
 
 const zonaHojas     = document.getElementById("zona-hojas");
 const archivoCsv    = document.getElementById("archivo-csv");
@@ -1156,6 +1208,7 @@ function crearEtiqueta(reg) {
 }
 
 function generarHojas(lista) {
+  POR_HOJA = modeloActual.porHoja;
   zonaHojas.innerHTML="";
   if(!lista||lista.length===0){contador.textContent="Sin datos cargados";return;}
   let idx=0,nh=0;
