@@ -718,7 +718,7 @@
         <p class="ayuda-subtitulo">Pasos para generar e imprimir etiquetas</p>
         <ol class="ayuda-lista">
           <li>Selecciona el <strong>modelo de etiqueta</strong> desde el menu desplegable segun el formato fisico que necesites (Janel J-5267, J-5260, etc.).</li>
-          <li>Prepara tu archivo CSV en Excel con una columna llamada exactamente <code>ETIQUETA</code>, con el formato <code>numero-Apellido Nombre</code>. Ejemplo: <code>10045001-Torres Mendoza Carlos Alberto</code>. Exporta desde Excel como CSV UTF-8.</li>
+          <li>Prepara tu archivo CSV en Excel con una columna llamada exactamente <code>ETIQUETA</code>, con el formato <code>numero-Apellido Nombre</code>. Ejemplo: <code>10045001-Torres Mendoza Carlos Alberto</code>. Si tienes el numero y el nombre en columnas separadas, usa la formula de Excel: <code>=CONCATENAR(A2,"-",B2)</code> o su equivalente <code>=A2&"-"&B2</code> para construir el valor en una sola celda. Exporta desde Excel como CSV UTF-8.</li>
           <li>Carga el CSV con el boton <strong>Cargar CSV</strong>. Si los caracteres especiales (acentos, n con tilde) salen mal, la herramienta los corregira automaticamente.</li>
           <li><strong>Opcional:</strong> Carga un logo en PNG o JPG para que aparezca en el lado izquierdo de cada etiqueta.</li>
           <li>Ajusta el <strong>tipo y tamano de letra</strong> desde los controles del panel si lo necesitas. Los cambios se aplican en tiempo real.</li>
