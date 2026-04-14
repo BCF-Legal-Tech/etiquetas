@@ -317,7 +317,30 @@
       color: #fff;
     }
 
-    /* Modal de ayuda */
+    /* Modal de privacidad - reutiliza estilos del modal de ayuda */
+    #modal-privacidad {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      z-index: 9998;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #modal-privacidad.visible { display: flex; }
+
+    /* Modal de privacidad */
+  const modalPrivacidad     = document.getElementById("modal-privacidad");
+  const btnCerrarPrivacidad = document.getElementById("btn-cerrar-privacidad");
+  if (btnCerrarPrivacidad) {
+    btnCerrarPrivacidad.addEventListener("click", function() { modalPrivacidad.classList.remove("visible"); });
+  }
+  if (modalPrivacidad) {
+    modalPrivacidad.addEventListener("click", function(e) { if(e.target===modalPrivacidad) modalPrivacidad.classList.remove("visible"); });
+  }
+
+  /* Modal de ayuda */
     #modal-ayuda {
       display: none;
       position: fixed;
@@ -675,7 +698,7 @@
         <div class="form-nuevo-usuario" id="form-nuevo-usuario">
           <div class="form-fila">
             <div class="form-campo"><label>Usuario</label><input type="text" id="new-user" placeholder="ej. rrhh_kone" /></div>
-            <div class="form-campo"><label>Contraseña</label><input type="text" id="new-pass" placeholder="contraseña" /></div>
+            <div class="form-campo"><label>Contraseña</label><input type="password" id="new-pass" placeholder="contraseña" /></div>
             <div class="form-campo"><label>Rol</label>
               <select id="new-rol"><option value="usuario">Usuario</option><option value="admin">Administrador</option></select>
             </div>
@@ -694,7 +717,7 @@
       <div class="admin-seccion-cuerpo">
         <div class="form-fila">
           <div class="form-campo"><label>Usuario</label><select id="chg-user-sel"></select></div>
-          <div class="form-campo"><label>Nueva contraseña</label><input type="text" id="chg-pass" placeholder="nueva contraseña" /></div>
+          <div class="form-campo"><label>Nueva contraseña</label><input type="password" id="chg-pass" placeholder="nueva contraseña" /></div>
         </div>
         <button class="btn-admin btn-editar" id="btn-cambiar-pass">Actualizar contraseña</button>
         <div class="admin-aviso" id="aviso-cambio"></div>
@@ -719,6 +742,35 @@
     </div>
   </div>
 
+  <!-- MODAL DE AVISO DE PRIVACIDAD -->
+  <div id="modal-privacidad">
+    <div class="ayuda-card">
+      <div class="ayuda-header">
+        <h2>Aviso de Privacidad Simplificado</h2>
+        <button class="ayuda-cerrar" id="btn-cerrar-privacidad" title="Cerrar">&#x2715;</button>
+      </div>
+      <div class="ayuda-cuerpo">
+        <p style="font-size:12.5px;color:#333;line-height:1.7;margin:0 0 14px;">
+          <strong>Responsable:</strong> BCF MG Consultor&#xED;a, S.C.<br>
+          <strong>Contacto:</strong> <a href="/cdn-cgi/l/email-protection#b4d7dbdac0d5d7c0dbf4d6d7d2ddc7d7d5d89ad9cc" style="color:#2E75B6;"><span class="__cf_email__" data-cfemail="88ebe7e6fce9ebfce7c8eaebeee1fbebe9e4a6e5f0">[email&#160;protected]</span></a>
+        </p>
+        <p style="font-size:12.5px;color:#444;line-height:1.7;margin:0 0 14px;">
+          Los datos personales ingresados en esta herramienta (nombres y n&#xFA;meros de expediente de empleados) son utilizados exclusivamente para la generaci&#xF3;n e impresi&#xF3;n de etiquetas de expedientes laborales.
+        </p>
+        <p style="font-size:12.5px;color:#444;line-height:1.7;margin:0 0 14px;">
+          Esta herramienta <strong>no almacena, transmite ni comparte datos con terceros</strong>. La informaci&#xF3;n cargada existe &#xFA;nicamente en la memoria del navegador durante la sesi&#xF3;n activa y se elimina al cerrar la p&#xE1;gina o al usar la funci&#xF3;n Limpiar.
+        </p>
+        <p style="font-size:12.5px;color:#444;line-height:1.7;margin:0 0 14px;">
+          Para ejercer sus derechos ARCO (Acceso, Rectificaci&#xF3;n, Cancelaci&#xF3;n y Oposici&#xF3;n) o consultar el aviso de privacidad integral, contacte a <a href="/cdn-cgi/l/email-protection#84e7ebeaf0e5e7f0ebc4e6e7e2edf7e7e5e8aae9fc" style="color:#2E75B6;"><span class="__cf_email__" data-cfemail="20434f4e544143544f60424346495343414c0e4d58">[email&#160;protected]</span></a>.
+        </p>
+        <div class="ayuda-soporte">
+          <strong>Fundamento legal</strong><br>
+          Ley Federal de Protecci&#xF3;n de Datos Personales en Posesi&#xF3;n de los Particulares (LFPDPPP).
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL DE AYUDA -->
   <div id="modal-ayuda">
     <div class="ayuda-card">
@@ -740,7 +792,7 @@
         <div class="ayuda-soporte">
           <strong>Soporte t&#xE9;cnico</strong><br>
           Para dudas o problemas contacta a BCF MG Consultor&#xED;a, S.C.:<br>
-          <a href="mailto:contacto@bcfiscal.mx">contacto@bcfiscal.mx</a>
+          <a href="/cdn-cgi/l/email-protection#23404c4d574240574c634140454a5040424f0d4e5b"><span class="__cf_email__" data-cfemail="385b57564c595b4c57785a5b5e514b5b5954165540">[email&#160;protected]</span></a>
         </div>
       </div>
     </div>
@@ -845,6 +897,8 @@
     &copy; <span id="footer-anio"></span> BCF MG Consultoria, S.C.. Herramienta de uso interno y confidencial.
     La información ingresada no es almacenada ni transmitida por el sistema.
     Uso exclusivo para usuarios autorizados.
+    &nbsp;|&nbsp;
+    <a href="#" id="link-privacidad" style="color:#7a8699;text-decoration:none;" onclick="document.getElementById('modal-privacidad').classList.add('visible');return false;">Aviso de Privacidad</a>
   </footer>
 
 </div>
@@ -909,9 +963,9 @@ function sha256(texto) {
    Se guarda en localStorage con hashes SHA-256, nunca texto plano.
    Formato: [{ usuario, hash, rol }]
 ================================================================ */
-const STORAGE_KEY = "bcfmg_v3_usuarios";
+const STORAGE_KEY = "bcfmg_v4_usuarios";
 
-/* Hashes pre-calculados de las contraseñas iniciales */
+/* Usuarios iniciales */
 const USUARIOS_INICIALES = [
   { usuario: "bcf",             hash: "13937ff79ff3662694333f7a9faebd9aae47a54c9ef4d34c18084c51bbb37b90", rol: "admin"   },
   { usuario: "ricardo.sanchez", hash: "539adc0fc8c3ea8ca926d4578c0181da0a32f87091ddf2503b3eb48dd37e26ac", rol: "usuario" },
@@ -985,7 +1039,12 @@ const inpUsuario = document.getElementById("inp-usuario");
 const inpPassword = document.getElementById("inp-password");
 const loginError  = document.getElementById("login-error");
 
-function intentarLogin() {
+/* Control de intentos de acceso */
+  let intentosFallidos = 0;
+  let bloqueado = false;
+
+  function intentarLogin() {
+    if (bloqueado) return;
   const u = inpUsuario.value.trim();
   const p = inpPassword.value;
 
@@ -1000,11 +1059,33 @@ function intentarLogin() {
   const encontrado = usuarios.find(x => x.usuario === u && x.hash === hashIngresado);
 
   if (!encontrado) {
+    intentosFallidos++;
+    if (intentosFallidos >= 5) {
+      bloqueado = true;
+      let segundos = 30;
+      loginError.classList.add("visible");
+      loginError.textContent = "Demasiados intentos fallidos. Espera " + segundos + " segundos.";
+      inpPassword.value = "";
+      document.getElementById("btn-entrar").disabled = true;
+      const intervalo = setInterval(function() {
+        segundos--;
+        if (segundos <= 0) {
+          clearInterval(intervalo);
+          bloqueado = false;
+          intentosFallidos = 0;
+          loginError.classList.remove("visible");
+          document.getElementById("btn-entrar").disabled = false;
+          inpUsuario.focus();
+        } else {
+          loginError.textContent = "Demasiados intentos fallidos. Espera " + segundos + " segundos.";
+        }
+      }, 1000);
+      return;
+    }
     loginError.classList.add("visible");
-    loginError.textContent = "Usuario o contraseña incorrectos. Intenta de nuevo.";
+    loginError.textContent = "Usuario o contraseña incorrectos. Intenta de nuevo. (" + intentosFallidos + "/5)";
     inpPassword.value = "";
     inpPassword.focus();
-    // Animacion de sacudida
     const card = document.querySelector(".login-card");
     card.style.animation = "none";
     card.offsetHeight;
@@ -1013,6 +1094,7 @@ function intentarLogin() {
   }
 
   loginError.classList.remove("visible");
+  intentosFallidos = 0;
   const sesion = { usuario: encontrado.usuario, rol: encontrado.rol };
   guardarSesion(sesion);
   document.getElementById("usuario-activo").textContent = encontrado.usuario;
@@ -1028,36 +1110,7 @@ document.getElementById("btn-entrar").addEventListener("click", intentarLogin);
 inpPassword.addEventListener("keydown", e => { if(e.key==="Enter") intentarLogin(); });
 inpUsuario.addEventListener("keydown",  e => { if(e.key==="Enter") inpPassword.focus(); });
 
-/* Herramienta de diagnostico - accesible con ?debug en la URL */
-(function() {
-  if (window.location.search.includes('debug')) {
-    const panel = document.createElement('div');
-    panel.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#1a1a2e;color:#0f0;font-family:monospace;font-size:12px;padding:12px;z-index:99999;max-height:200px;overflow:auto;';
-    panel.innerHTML = '<b>DIAGNOSTICO BCF</b><br>';
-    document.body.appendChild(panel);
 
-    async function log(msg) {
-      panel.innerHTML += msg + '<br>';
-      panel.scrollTop = panel.scrollHeight;
-    }
-
-    (async function() {
-      await log('localStorage key: bcfmg_v3_usuarios');
-      const raw = localStorage.getItem('bcfmg_v3_usuarios');
-      await log('localStorage data: ' + (raw ? raw.substring(0,80)+'...' : 'VACIO - se usaran iniciales'));
-
-      // Calcular hash de BCF2024$ en este navegador
-      const pwd = 'BCF2024$';
-      const enc = new TextEncoder();
-      const buf = await crypto.subtle.digest('SHA-256', enc.encode(pwd));
-      const hash = Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-      await log('Hash "BCF2024$" en este navegador: ' + hash);
-      await log('Hash esperado:                    01f7c00f9f0b7388c2f438ada6a574bdf0b62450dee0856e04821daed34616fd');
-      await log('Coinciden: ' + (hash === '01f7c00f9f0b7388c2f438ada6a574bdf0b62450dee0856e04821daed34616fd' ? 'SI ✓' : 'NO ✗ - ESTE ES EL PROBLEMA'));
-
-      const sesion = sessionStorage.getItem('bcfmg_sesion');
-      await log('sessionStorage sesion: ' + (sesion || 'ninguna'));
-    })();
   }
 })();
 
@@ -1225,16 +1278,16 @@ document.getElementById("btn-cambiar-pass").addEventListener("click", function()
    APP DE ETIQUETAS
 ================================================================ */
 const EJEMPLO = [
-  { etiqueta: "10045231-Garcia Lopez Juan Carlos" },
-  { etiqueta: "10045232-Martinez Ruiz Ana Lucia" },
-  { etiqueta: "32100006-Peralta Maya Carlos Ignacio" },
-  { etiqueta: "32100009-Vazquez Orihuela Carlos" },
-  { etiqueta: "32100017-Hernandez Rodriguez Gelacio Damian" },
-  { etiqueta: "32100031-Mainfelt Moguel Victor Francisco" },
-  { etiqueta: "32100039-Gutierrez Castillo Eduardo" },
-  { etiqueta: "32100042-Vizuet Vizuet Oscar" },
-  { etiqueta: "32100055-Munoz Espinoza Jose de Jesus" },
-  { etiqueta: "32100061-Ortuno Ramos Patricia Nohemi" }
+  { etiqueta: "10000001-Altamirano Reyes Luis Fernando" },
+  { etiqueta: "10000002-Bustamante Rios Carmen Dolores" },
+  { etiqueta: "10000003-Cervantes Ibarra Marco Antonio" },
+  { etiqueta: "10000004-Delgadillo Soto Patricia Elena" },
+  { etiqueta: "10000005-Espinosa Fuentes Roberto Javier" },
+  { etiqueta: "10000006-Figueroa Mora Sandra Beatriz" },
+  { etiqueta: "10000007-Guerrero Salinas Hector Manuel" },
+  { etiqueta: "10000008-Herrera Zamora Claudia Ivette" },
+  { etiqueta: "10000009-Iriarte Campos Jorge Alejandro" },
+  { etiqueta: "10000010-Juarez Montes Laura Esperanza" }
 ];
 
 /* ================================================================
@@ -1478,19 +1531,4 @@ aplicarTipografia();
   const btnCerrarAyuda = document.getElementById("btn-cerrar-ayuda");
 
   if (btnAyuda) {
-    btnAyuda.addEventListener("click", function() { modalAyuda.classList.add("visible"); });
-  }
-  if (btnCerrarAyuda) {
-    btnCerrarAyuda.addEventListener("click", function() { modalAyuda.classList.remove("visible"); });
-  }
-  if (modalAyuda) {
-    modalAyuda.addEventListener("click", function(e) { if(e.target===modalAyuda) modalAyuda.classList.remove("visible"); });
-  }
-  document.addEventListener("keydown", function(e) { if(e.key==="Escape") { if(modalAyuda) modalAyuda.classList.remove("visible"); } });
-
-/* Año actual en el footer */
-const elAnio = document.getElementById("footer-anio");
-if (elAnio) elAnio.textContent = new Date().getFullYear();
-</script>
-</body>
-</html>
+    btnAyuda.addEventListener("click", function() { modal
