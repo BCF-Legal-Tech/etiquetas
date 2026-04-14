@@ -957,6 +957,7 @@ function sha256(texto) {
   }
   return H.map(x=>x.toString(16).padStart(8,'0')).join('');
 }
+window.sha256 = sha256;
 
 /* ================================================================
    BASE DE DATOS DE USUARIOS
@@ -1109,10 +1110,6 @@ const loginError  = document.getElementById("login-error");
 document.getElementById("btn-entrar").addEventListener("click", intentarLogin);
 inpPassword.addEventListener("keydown", e => { if(e.key==="Enter") intentarLogin(); });
 inpUsuario.addEventListener("keydown",  e => { if(e.key==="Enter") inpPassword.focus(); });
-
-
-  }
-})();
 
 /* Animacion de error */
 const estiloShake = document.createElement("style");
@@ -1531,4 +1528,30 @@ aplicarTipografia();
   const btnCerrarAyuda = document.getElementById("btn-cerrar-ayuda");
 
   if (btnAyuda) {
-    btnAyuda.addEventListener("click", function() { modal
+    btnAyuda.addEventListener("click", function() { modallAyuda.classList.add("visible"); });
+  }
+  if (btnCerrarAyuda) {
+    btnCerrarAyuda.addEventListener("click", function() { modalAyuda.classList.remove("visible"); });
+  }
+  if (modalAyuda) {
+    modalAyuda.addEventListener("click", function(e) { if(e.target===modalAyuda) modalAyuda.classList.remove("visible"); });
+  }
+  document.addEventListener("keydown", function(e) { if(e.key==="Escape") { if(modalAyuda) modalAyuda.classList.remove("visible"); if(modalPrivacidad) modalPrivacidad.classList.remove("visible"); } });
+
+  /* Modal de privacidad */
+  const modalPrivacidad     = document.getElementById("modal-privacidad");
+  const btnCerrarPrivacidad = document.getElementById("btn-cerrar-privacidad");
+  if (btnCerrarPrivacidad) {
+    btnCerrarPrivacidad.addEventListener("click", function() { modalPrivacidad.classList.remove("visible"); });
+  }
+  if (modalPrivacidad) {
+    modalPrivacidad.addEventListener("click", function(e) { if(e.target===modalPrivacidad) modalPrivacidad.classList.remove("visible"); });
+  }
+
+  /* Año actual en el footer */
+  const elAnio = document.getElementById("footer-anio");
+  if (elAnio) elAnio.textContent = new Date().getFullYear();
+
+</script>
+</body>
+</html>
